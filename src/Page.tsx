@@ -1,6 +1,10 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import "primereact/resources/themes/lara-light-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
 
 interface Row {
   id: number;
@@ -8,8 +12,8 @@ interface Row {
   placeOfOrigin: string;
   artistDisplay: string;
   inscriptions: string;
-  dateStart: Date;
-  dateEnd: Date;
+  dateStart: number;
+  dateEnd: number;
 }
 
 export default function LazyPage() {
@@ -17,6 +21,8 @@ export default function LazyPage() {
 
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [rowData, setRowData] = useState<Row[]>([]);
+  const [rowClick, setRowClick] = useState(true);
+  const [selectedRow, setSelectedRow] = useState<Row[]>([]);
 
   useEffect(() => {
     axios
@@ -44,12 +50,32 @@ export default function LazyPage() {
   }, [pageNumber]);
 
   useEffect(() => {
-    console.log(rowData.length);
+    console.log(rowData);
   }, [rowData]);
 
   return (
-    <div>
-      <DataTable></DataTable>
+    <div className="card">
+      <DataTable
+        value={rowData}
+        selectionMode={rowClick ? null : "checkbox"}
+        selection={selectedRow}
+        onSelectionChange={(e) => {
+          setSelectedRow(e.value);
+        }}
+        dataKey="id"
+        tableStyle={{ minWidth: "40rem" }}
+      >
+        <Column
+          selectionMode="multiple"
+          headerStyle={{ width: "2rem" }}
+        ></Column>
+        <Column field="title" header="Title"></Column>
+        <Column field="dateStart" header="Date start"></Column>
+        <Column field="dateEnd" header="Date end"></Column>
+        <Column field="placeOfOrigin" header="Place of origin"></Column>
+        <Column field="artistDisplay" header="Artist Display"></Column>
+        <Column field="inscriptions" header="Inscriptions"></Column>
+      </DataTable>
     </div>
   );
 }
