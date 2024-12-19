@@ -118,7 +118,7 @@ export default function LazyPage() {
         rows={12}
         totalRecords={totalPages * 12}
         onPageChange={handlePageChange}
-        pageLinkSize={5}
+        pageLinkSize={10}
         template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
         currentPageReportTemplate={`Page {currentPage} of ${totalPages}`}
       />
