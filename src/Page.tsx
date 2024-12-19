@@ -1,7 +1,10 @@
 import axios from "axios";
 import "primeicons/primeicons.css";
 import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
+import {
+  DataTable,
+  DataTableSelectionSingleChangeEvent,
+} from "primereact/datatable";
 import { Paginator } from "primereact/paginator";
 import "primereact/resources/primereact.min.css";
 import "primereact/resources/themes/lara-light-blue/theme.css";
@@ -70,7 +73,9 @@ export default function LazyPage() {
       });
   }, [pageNumber]);
 
-  const handleSelectionChange = (e: { value: Row[] }) => {
+  const handleSelectionChange = (e: {
+    value: DataTableSelectionSingleChangeEvent<Row[]>;
+  }) => {
     // Update the selection state for the current page
     const selectedRowIdsForCurrentPage = e.value.map((row: Row) => row.id);
     setCurrentPageSelectionIds(selectedRowIdsForCurrentPage);
