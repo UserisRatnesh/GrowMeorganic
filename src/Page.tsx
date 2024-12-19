@@ -24,13 +24,15 @@ export default function LazyPage() {
 
   // It serves as global state of each page selection
   // because we are maintaining a json object with pagenumber as key and page data array as value
-  const [selectedRows, setSelectedRows] = useState<{ [page: number]: Row[] }>(
-    {},
-  );
+  const [selectedRowIds, setSelectedRowIds] = useState<{
+    [page: number]: number[];
+  }>({});
 
   // Maintain current state of each page
   // Will be using it to update global state whenever we change page
-  const [currentPageSelection, setCurrentPageSelection] = useState<Row[]>([]);
+  const [currentPageSelectionIds, setCurrentPageSelectionIds] = useState<
+    number[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -56,7 +58,9 @@ export default function LazyPage() {
         }
 
         // resstoring the selection for current page
-        setCurrentPageSelection(selectedRows[pageNumber] || []);
+        setCurrentPageSelectionIds(
+          (selectedRowIds[pageNumber] || []).map((id) => id),
+        );
       })
       .catch(() => {
         console.log("Error loading data");
@@ -68,16 +72,16 @@ export default function LazyPage() {
 
   const handleSelectionChange = (e: { value: Row[] }) => {
     // Update the selection state for the current page
-    const selectedRowsForCurrentPage = e.value;
-    setCurrentPageSelection(selectedRowsForCurrentPage);
+    const selectedRowIdsForCurrentPage = e.value.map((row: Row) => row.id);
+    setCurrentPageSelectionIds(selectedRowIdsForCurrentPage);
 
     // Update the global selection state
-    setSelectedRows((previousSelection) => {
+    setSelectedRowIds((previousSelection) => {
       // Copy previously selected rows for different pages
-      const updatedSelection = { ...previousSelection }; // This is the most expensive operation
+      const updatedSelection = { ...previousSelection };
 
-      // Update the selection for the current page
-      updatedSelection[pageNumber] = selectedRowsForCurrentPage;
+      // Update the selection for the current page (store only IDs)
+      updatedSelection[pageNumber] = selectedRowIdsForCurrentPage;
 
       return updatedSelection;
     });
@@ -90,7 +94,9 @@ export default function LazyPage() {
       <DataTable
         value={rowData}
         selectionMode="checkbox"
-        selection={currentPageSelection}
+        selection={currentPageSelectionIds.map((id: number) =>
+          rowData.find((row: Row) => row.id === id),
+        )}
         onSelectionChange={handleSelectionChange}
         loading={loading}
         dataKey="id"
